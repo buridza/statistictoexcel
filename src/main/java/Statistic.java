@@ -47,7 +47,7 @@ public class Statistic {
             XSSFCell cell;
             for (; i < size(list, i) && i < 1048576; i++) {
                 sheet = workbook.getSheet("sheet for denis");
-                row = sheet.getRow(i);
+                row = sheet.createRow(i);
                 cell = row.createCell(columnIndex);
                 cell.setCellValue(list.get(i));
             }
