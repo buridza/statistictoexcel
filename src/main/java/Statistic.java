@@ -22,7 +22,7 @@ public class Statistic {
         statistic.FILE = str;
         statistic.filling(move, countTime);
         for (int i = 0; i < countTime.size()-1; i++) {
-            if(countTime.get(i)==countTime.get(i+1)) countTime.remove(i+1);
+            if(countTime.get(i).equals(countTime.get(i+1))) countTime.remove(i--);
         }
 
         XSSFWorkbook workbook = new XSSFWorkbook();
