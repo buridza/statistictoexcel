@@ -8,25 +8,43 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Statistic {
+
+
+    private static final int MAX_ITERATIONS = 5000;
+
     String FILE = "str";
 
     public static void main(String[] args) {
-        List<Long> move = new ArrayList<Long>();
-        List<Long> countTime = new ArrayList<Long>();
+        List<Long> move = new ArrayList<Long>(MAX_ITERATIONS);
+        List<Long> countTime = new LinkedList<>();
+
         String str = (LocalDateTime.now().toString().replaceAll(":",".")+ " statistic.xlsx" );
 
         Statistic statistic = new Statistic();
         statistic.FILE = str;
         statistic.filling(move, countTime);
-        for (int i = 0; i < countTime.size()-1; i++) {
-            if(countTime.get(i).equals(countTime.get(i+1))) countTime.remove(i--);
+
+        //filtering works much faster with LinkedList rather than ArrayList
+        Long previous = null;
+        Iterator<Long> countInterator = countTime.iterator();
+        while (countInterator.hasNext()) {
+            Long current = countInterator.next();
+            if (current.equals(previous)) {
+                countInterator.remove();
+            }
+            previous = current;
         }
 
-        XSSFWorkbook workbook = new XSSFWorkbook();
+        //methods below use List.get(index) a lot, so convert LinkedList to ArrayList
+        countTime = new ArrayList<>(countTime);
 
+        //geenrate excel
+        XSSFWorkbook workbook = new XSSFWorkbook();
         statistic.toExcel(workbook, move, 0);
         statistic.toExcel(workbook, countTime, 1);
     }
@@ -71,7 +89,7 @@ public class Statistic {
         long startTime = System.currentTimeMillis();
         long timeMillis = startTime;
 
-        while (timeMillis - startTime < 5000) {
+        while (timeMillis - startTime < MAX_ITERATIONS) {
             if ((x != MouseInfo.getPointerInfo().getLocation().x || y != MouseInfo.getPointerInfo().getLocation().y)) {
                 move.add(System.currentTimeMillis() - timeMillis);
                 timeMillis = System.currentTimeMillis();
